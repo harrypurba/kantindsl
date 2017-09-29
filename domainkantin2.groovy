@@ -7,30 +7,39 @@ class Domainkantin {
 		println("Domain Kantin")
 		
 		// Inisialisasi 
-		def kasir = new Kasir("Verisky")
-		daftarKasir.add(kasir)
+		def kasirVerisky = new Kasir("Verisky")
+		daftarKasir.add(kasirVerisky)
 		
-		// Melakukan pemesanan
-		order("Aqua", 101)
-		order("NasiGoreng", 2)
-		order("AyamGoreng", 2)
-		order("Ikan", 1)
-		selesaiOrder()
+		def pelangganRio = new Pelanggan("Rio")
+
+		// Pelanggan Rio Melakukan pemesanan
+		order(pelangganRio,"Aqua", 101)
+		order(pelangganRio,"NasiGoreng", 2)
+		order(pelangganRio,"AyamGoreng", 2)
+		order(pelangganRio,"Ikan", 1)
+		selesaiOrder(pelangganRio)
 		cetakTransaksiX()
 
-		// Melakukan pemesanan
-		order("Aqua", 101)
-		order("NasiGoreng", 2)
-		order("AyamGoreng", 2)
-		order("Ikan", 1)
-		selesaiOrder()
+		def pelangganHarry = new Pelanggan("Harry")
+
+		println()
+		println("===================================")
+		println()
+		println()
+		
+		// Pelanggan Harry Melakukan pemesanan
+		order(pelangganHarry,"Aqua", 101)
+		order(pelangganHarry,"NasiGoreng", 2)
+		order(pelangganHarry,"AyamGoreng", 2)
+		order(pelangganHarry,"Ikan", 1)
+		selesaiOrder(pelangganHarry)
 		cetakTransaksiX()
 
 		selesaiOrder()
 	} 
 	
-	static def order(menu, jumlah) {
-		int total = daftarKasir[0].order(menu, jumlah)
+	static def order(pelanggan, menu, jumlah) {
+		int total = daftarKasir[0].order(pelanggan, menu, jumlah)
 		if (total != 0) {
 
 			// jika belum ada transaksi sama sekali, maka tambah transaksi baru
@@ -45,7 +54,7 @@ class Domainkantin {
 		}
 	}
 	
-	static def selesaiOrder() {
+	static def selesaiOrder(pelanggan) {
 		// jika belum ada transaksi sama sekali, semantik salah
 		if(daftarKasir[0].getTransaksiTerakhir() == null){
 			println("Anda belum pernah melakukan order, silahkan order terlebih dahulu")
@@ -106,13 +115,13 @@ class Kasir{
 	}
 	
 	def daftarMenu = new DaftarMenu();
-	def order(menu, jumlah) {
+	def order(pelanggan, menu, jumlah) {
 		def foundMenu = daftarMenu.getMenu(menu);
 		def hargaSatuan = 0
 		if (foundMenu) {
 			hargaSatuan = foundMenu.harga
 			if (foundMenu.stok > jumlah) {
-				println("Pesan " + jumlah + " " + menu + " " + hargaSatuan + " kepada "  + nama)
+				println("Pesan " + jumlah + " " + menu + " " + hargaSatuan + " kepada "  + pelanggan.nama)
 			}
 			else { // Pesanan melebihi stok tersisa
 				println("Hanya tersedia stok " + foundMenu.nama + " : " + foundMenu.stok) 
