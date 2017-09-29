@@ -84,11 +84,15 @@ class Menu{
 	String nama
 	int harga
 	int stok
+	List<BahanBaku> listBahanBaku
 	
-	Menu(_nama, _harga, _stok) {
+	Menu(_nama, _harga, _stok, List<String> _listBahanBaku) {
 		nama = _nama
 		harga = _harga
 		stok = _stok
+		_listBahanBaku.each {
+			item->listBahanBaku.add(DaftarBahanBaku.get(item))
+		}
 	}
 }
 
@@ -96,6 +100,33 @@ class Kantin{
 	String nama
 	Kantin(_nama) {
 		nama = _nama
+	}
+}
+
+class BahanBaku{
+	String nama
+	BahanBaku(_nama, _stok) {
+		nama = _nama
+		stok = _stok
+	}
+}
+
+class DaftarBahanBaku{
+	static List<Menu> listBahanBaku = [
+			new BahanBaku("Beras", 50),
+			new BahanBaku("MinyakGoreng", 10),
+			new BahanBaku("DagingAyam", 50),
+			new BahanBaku("Telur", 100),
+			new BahanBaku("JambuBiji", 20),
+			new BahanBaku("Kecap", 10),
+			new BahanBaku("Garam", 20),
+		]
+	DaftarBahanBaku() {
+		
+	}
+	static def getBahanBaku(String nama) {
+		def bahanBaku = listBahanBaku.find{item -> item.nama == nama}
+		return bahanBaku
 	}
 }
 
