@@ -1,25 +1,34 @@
+import java.text.SimpleDateFormat
+
 class Domainkantin{
 	static def kasir
-	static def sum = 0;
+	static def transaksi
 	
 	static void main(String[] args){
 		println("Domain Kantin")
 		
 		// Inisialisasi 
 		kasir = new Kasir("Verisky")
+		transaksi = new Transaksi()
 		
 		// Melakukan pemesanan
 		order("Aqua", 101)
 		order("NasiGoreng", 2)
+		order("AyamGoreng", 2)
 		order("Ikan", 1)
 		selesaiOrder()
-	}
+		transaksi.print()
+	} 
+	
 	static def order(menu, jumlah) {
-		sum += kasir.order(menu, jumlah)
+		int total = kasir.order(menu, jumlah)
+		if (total != 0) {
+			transaksi.add(new Order(DaftarMenu.getMenu(menu), jumlah))
+		}
 	}
+	
 	static def selesaiOrder() {
-		println("Total harga " + sum)
-		sum = 0;
+		println("Total harga " + transaksi.getTotal())
 	}
 }
 
@@ -91,9 +100,7 @@ class Kantin{
 }
 
 class DaftarMenu{
-	static List<Menu> listMenu
-	DaftarMenu() {
-		listMenu = [
+	static List<Menu> listMenu = [
 			new Menu("Nasi", 4000, 50),
 			new Menu("NasiGoreng", 8000, 55),
 			new Menu("Soto", 12000, 20),
@@ -103,10 +110,46 @@ class DaftarMenu{
 			new Menu("TehPucuk", 4000, 30),
 			new Menu("JusJambu", 8000, 5),
 		]
+	DaftarMenu() {
+		
 	}
-	def getMenu(String nama) {
-		def menu = listMenu.find{item -> item.nama == nama};
+	static def getMenu(String nama) {
+		def menu = listMenu.find{item -> item.nama == nama}
 		return menu
 	}
 }
 
+class Order {
+	Menu menu
+	int jumlah
+	Order(_menu, _jumlah) {
+		menu = _menu
+		jumlah = _jumlah
+	}
+}
+
+class Transaksi{
+	List<Order> listOrder = []
+	def add(menu) {
+		listOrder.add(menu)
+	}
+	def getTotal() {
+		int total = 0;
+		listOrder.each {
+			item -> total+=item.menu.harga*item.jumlah
+		}
+		return total
+	}
+	def print() {
+		println()
+		println ("---------Transaction----------")
+		def date = new Date()
+		def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+		println sdf.format(date)
+		listOrder.each {
+			item -> println(item.jumlah + " " + item.menu.nama + " @" +  item.menu.harga 
+			+ "\t" + item.menu.harga*item.jumlah)
+		}
+		println("\t\t\t" + getTotal())
+	}
+}
