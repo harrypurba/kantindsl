@@ -2,6 +2,7 @@ import java.text.SimpleDateFormat
 
 class Domainkantin{
 	static def kasir
+	static def pelayan
 	static def transaksi
 	
 	static void main(String[] args){
@@ -9,6 +10,7 @@ class Domainkantin{
 		
 		// Inisialisasi 
 		kasir = new Kasir("Verisky")
+		pelayan = new Pelayan("Rio")
 		transaksi = new Transaksi()
 		
 		// Melakukan pemesanan
@@ -18,12 +20,13 @@ class Domainkantin{
 		order("Ikan", 1)
 		selesaiOrder()
 		transaksi.print()
+		pelayan.siapkanPesanan(transaksi)
 	} 
 	
 	static def order(menu, jumlah) {
 		int total = kasir.order(menu, jumlah)
 		if (total != 0) {
-			transaksi.add(new Order(DaftarMenu.getMenu(menu), jumlah))
+			transaksi.add(new Order(DaftarMenu.get(menu), jumlah))
 		}
 	}
 	
@@ -51,6 +54,15 @@ class Pelayan{
 	Pelayan(_nama) {
 		nama = _nama
 	}
+	def siapkanPesanan(transaksi) {
+		// Dalam sebuah transaksi siapkan semua pesanannya
+		transaksi.listOrder.each {
+			item -> item.menu.listBahanBaku.each {
+				bahanBaku -> bahanBaku.stok = bahanBaku.stok - 1 
+			}
+		}
+		println("Pesanan sudah siap.")
+	}
 }
 
 class Kasir{
@@ -60,12 +72,13 @@ class Kasir{
 	}
 		def daftarMenu = new DaftarMenu();
 	def order(menu, jumlah) {
-		def foundMenu = daftarMenu.getMenu(menu);
+		def foundMenu = daftarMenu.get(menu);
 		def hargaSatuan = 0
 		if (foundMenu) {
 			hargaSatuan = foundMenu.harga
 			if (foundMenu.stok > jumlah) {
 				println("Pesan " + jumlah + " " + menu + " " + hargaSatuan + " kepada "  + nama)
+				foundMenu.stok -= jumlah;
 			}
 			else { // Pesanan melebihi stok tersisa
 				println("Hanya tersedia stok " + foundMenu.nama + " : " + foundMenu.stok) 
@@ -84,11 +97,16 @@ class Menu{
 	String nama
 	int harga
 	int stok
+	static DaftarBahanBaku daftarBahanBakuTersedia = new DaftarBahanBaku()
+	List<BahanBaku> listBahanBaku = []
 	
-	Menu(_nama, _harga, _stok) {
+	Menu(_nama, _harga, _stok, List<String> _listBahanBaku) {
 		nama = _nama
 		harga = _harga
 		stok = _stok
+		_listBahanBaku.each {
+			item->listBahanBaku.add(daftarBahanBakuTersedia.get(item))
+		}
 	}
 }
 
@@ -99,21 +117,52 @@ class Kantin{
 	}
 }
 
+class BahanBaku{
+	String nama
+	int stok
+	BahanBaku(_nama, _stok) {
+		nama = _nama
+		stok = _stok
+	}
+}
+
+class DaftarBahanBaku{
+	static List<Menu> listBahanBaku = [
+			new BahanBaku("Beras", 50),
+			new BahanBaku("MinyakGoreng", 10),
+			new BahanBaku("DagingAyam", 50),
+			new BahanBaku("Telur", 100),
+			new BahanBaku("JambuBiji", 20),
+			new BahanBaku("Kecap", 10),
+			new BahanBaku("Garam", 20),
+		]
+	DaftarBahanBaku() {
+		
+	}
+	static def get(String nama) {
+		def bahanBaku = listBahanBaku.find{item -> item.nama == nama}
+		if (bahanBaku==null) {
+			println("Bahan baku " + nama + " tidak tersedia.");
+		}
+		return bahanBaku
+	}
+}
+
 class DaftarMenu{
 	static List<Menu> listMenu = [
-			new Menu("Nasi", 4000, 50),
-			new Menu("NasiGoreng", 8000, 55),
-			new Menu("Soto", 12000, 20),
-			new Menu("AyamGoreng", 10000, 50),
-			new Menu("TelurDadar", 5000, 75),
-			new Menu("Aqua", 3000, 100),
-			new Menu("TehPucuk", 4000, 30),
-			new Menu("JusJambu", 8000, 5),
+			new Menu("Nasi", 4000, 50, ["Beras"]),
+			new Menu("NasiGoreng", 8000, 55, ["Beras", "Garam", "Kecap"]),
+			new Menu("Soto", 12000, 20, ["DagingAyam", "Garam"]),
+			new Menu("AyamGoreng", 10000, 50, ["DagingAyam", "MinyakGoreng", "Garam"]),
+			new Menu("TelurDadar", 5000, 75, ["Telur", "MinyakGoreng", "Garam"]),
+			new Menu("Aqua", 3000, 100, []),
+			new Menu("TehPucuk", 4000, 30, []),
+			new Menu("JusJambu", 8000, 5, ["JambuBiji"]),
 		]
 	DaftarMenu() {
 		
 	}
-	static def getMenu(String nama) {
+	static def get(String nama) {
 		def menu = listMenu.find{item -> item.nama == nama}
 		return menu
 	}
