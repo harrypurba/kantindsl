@@ -32,6 +32,7 @@ class Domainkantin{
 	
 	static def selesaiOrder() {
 		println("Total harga " + transaksi.getTotal())
+		transaksi = 
 	}
 }
 

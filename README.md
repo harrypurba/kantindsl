@@ -1,10 +1,12 @@
 "# kantindsl" 
+Script : domainkantin2
+1. Define pelanggan yang akan membeli
+2. Lakukan order
+3. Setelah selesai transaksi akan tercetak
 
-checklist  
-[Done] jual beli makan  
-[Done] bahan baku: bahan mentah/bahan baku  
-[Done] sampai diserahkan ke pembeli  
-[ ] ada tempat makan  
-[ ] take away/dine-in  
-[ ] orang meninggalkan tempat  
+def pelangganRio = new Pelanggan("Rio")  
+order(pelangganRio,"NasiGoreng", 2)  
+order(pelangganRio,"AyamGoreng", 2)   
+selesaiOrder(pelangganRio)  
+cetakTransaksi()  
 
