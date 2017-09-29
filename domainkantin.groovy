@@ -1,18 +1,21 @@
 class Domainkantin{
-	static def listPelayan
+	static def kasir
 	static def sum = 0;
 	
 	static void main(String[] args){
 		println("Domain Kantin")
 		
-		listPelayan = [new Pelayan("Verisky"), new Pelayan("Rio")]
-		order("Aqua", 1)
+		// Inisialisasi 
+		kasir = new Kasir("Verisky")
+		
+		// Melakukan pemesanan
+		order("Aqua", 101)
 		order("NasiGoreng", 2)
 		order("Ikan", 1)
 		selesaiOrder()
 	}
 	static def order(menu, jumlah) {
-		sum += listPelayan[0].order(menu, jumlah)
+		sum += kasir.order(menu, jumlah)
 	}
 	static def selesaiOrder() {
 		println("Total harga " + sum)
@@ -36,19 +39,8 @@ class Jurumasak{
 
 class Pelayan{
 	String nama
-	def daftarMenu = new DaftarMenu();
 	Pelayan(_nama) {
 		nama = _nama
-	}
-	def order(menu, jumlah) {
-		def hargaSatuan = daftarMenu.getHarga(menu);
-		if (hargaSatuan) {
-			println("Pesan " + jumlah + " " + menu + " " + hargaSatuan + " kepada "  + nama)
-		}
-		else {
-			println("Menu " + menu + " tidak tersedia")
-		}
-		return hargaSatuan*jumlah
 	}
 }
 
@@ -57,14 +49,37 @@ class Kasir{
 	Kasir(_nama) {
 		nama = _nama
 	}
+		def daftarMenu = new DaftarMenu();
+	def order(menu, jumlah) {
+		def foundMenu = daftarMenu.getMenu(menu);
+		def hargaSatuan = 0
+		if (foundMenu) {
+			hargaSatuan = foundMenu.harga
+			if (foundMenu.stok > jumlah) {
+				println("Pesan " + jumlah + " " + menu + " " + hargaSatuan + " kepada "  + nama)
+			}
+			else { // Pesanan melebihi stok tersisa
+				println("Hanya tersedia stok " + foundMenu.nama + " : " + foundMenu.stok) 
+				return 0
+			}
+				
+		}
+		else { // Pesanan tidak tersedia di menu
+			println("Menu " + menu + " tidak tersedia")
+		}
+		return hargaSatuan*jumlah
+	}
 }
 
 class Menu{
 	String nama
 	int harga
-	Menu(_nama, _harga) {
+	int stok
+	
+	Menu(_nama, _harga, _stok) {
 		nama = _nama
 		harga = _harga
+		stok = _stok
 	}
 }
 
@@ -79,22 +94,19 @@ class DaftarMenu{
 	static List<Menu> listMenu
 	DaftarMenu() {
 		listMenu = [
-			new Menu("Nasi", 4000),
-			new Menu("NasiGoreng", 8000),
-			new Menu("Soto", 12000),
-			new Menu("AyamGoreng", 10000),
-			new Menu("TelurDadar", 5000),
-			new Menu("Aqua", 3000),
-			new Menu("TehPucuk", 4000),
-			new Menu("JusJambu", 8000),
+			new Menu("Nasi", 4000, 50),
+			new Menu("NasiGoreng", 8000, 55),
+			new Menu("Soto", 12000, 20),
+			new Menu("AyamGoreng", 10000, 50),
+			new Menu("TelurDadar", 5000, 75),
+			new Menu("Aqua", 3000, 100),
+			new Menu("TehPucuk", 4000, 30),
+			new Menu("JusJambu", 8000, 5),
 		]
 	}
-	def getHarga(String nama) {
+	def getMenu(String nama) {
 		def menu = listMenu.find{item -> item.nama == nama};
-		def harga = 0;
-		if (menu)
-			harga = menu.harga
-		return harga
+		return menu
 	}
 }
 
