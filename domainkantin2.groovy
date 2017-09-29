@@ -33,6 +33,9 @@ class Domainkantin {
 		selesaiOrder(pelangganHarry)
 		cetakTransaksi()
 		//cetakTransaksiTerakhir()
+
+		cetakTransaksiBulanKe(8, 2017)
+		cetakTransaksiBulanKe(9, 2017)
 		
 	} 
 	
@@ -94,6 +97,14 @@ class Domainkantin {
 
 	static def cetakTransaksiTerakhir(){
 		KASIR.cetakTransaksiTerakhir()
+	}
+
+	static def takeAway(){
+		KASIR.takeAway()
+	}
+	
+	static def cetakTransaksiBulanKe(i, tahun){
+		KASIR.cetakTransaksiBulanKe(i, tahun)
 	}
 }
 
@@ -217,6 +228,27 @@ class Kasir{
 		else
 			return listTransaksi[-1]
 	}
+
+	def cetakTransaksiBulanKe(i, tahun){
+		List<Transaksi> listTransaksiBulanan = []
+		listTransaksi.eachWithIndex { it, index ->
+			if(it.getYearTransaction() == tahun && it.getMonthTransaction() == i)
+				listTransaksiBulanan.add(it)
+		}
+
+		println ""
+		println ""
+		println "+"
+		println ("| Laporan Transaksi Bulan ke-" + i + " Tahun " + tahun)
+		println "+"
+		if(listTransaksiBulanan.size() == 0)
+			println ("+ TIDAK ADA TRANSAKSI ----------")
+		else
+			listTransaksiBulanan.eachWithIndex{ it, index ->
+				it.printReport();
+			}
+		println ("+ Laporan Transaksi Bulanan END   ----------")
+	}
 }
 
 class Menu{
@@ -310,9 +342,36 @@ class Transaksi{
 	List<Order> listOrder = []
 	Integer indexOrder
 	Boolean transaksiSelesai = false
+	Boolean isTakeAway = false
+	Date transactionDate
 
 	Transaksi(i){
 		indexOrder = i
+	}
+
+
+	def takeAway(){
+		isTakeAway = true
+	}
+
+	def getTakeAwayStatus(){
+		return isTakeAway
+	}
+
+	def setTransactionDate(Date date){
+		transactionDate = date
+	}
+
+	def getTransactionDate(){
+		return transactionDate
+	}
+
+	def getMonthTransaction(){
+		return transactionDate.getMonth() + 1
+	}
+
+	def getYearTransaction(){
+		return (((int) (transactionDate.getYear() / 100) + 19) * 100) + (transactionDate.getYear() % 100);
 	}
 
 	def setIndexOrder(Integer i){
@@ -346,28 +405,44 @@ class Transaksi{
 		println()
 		println ("---------Transaction #" + indexOrder + "----------")
 		def date = new Date()
+		setTransactionDate(date)
+		println getYearTransaction()
 		def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
-		println sdf.format(date)
+		println sdf.format(date) + (isTakeAway ? " Take away" : " Dine-in")
 		listOrder.each {
 			item -> println(item.jumlah + " " + item.menu.nama + " @" +  item.menu.harga 
 			+ "\t" + item.menu.harga*item.jumlah)
 		}
 		println("\t\t\t" + getTotal())
 		println ""
-		//println ""
+		println ""
 	}
 
 	def printAgain() {
 		println ("| ---------Transaction #" + indexOrder + "----------")
 		def date = new Date()
 		def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
-		println "| " + sdf.format(date)
+		println "| " + sdf.format(date) + (isTakeAway ? " Take away" : " Dine-in")
 		listOrder.each {
 			item -> println("| " + item.jumlah + " " + item.menu.nama + " @" +  item.menu.harga 
 			+ "\t" + item.menu.harga*item.jumlah)
 		}
 		println("| " + "\t\t\t" + getTotal())
 		println "| "
-		//println "| "
+		println "| "
+	}
+
+	def printReport() {
+		println ("##---------Transaction #" + indexOrder + "----------")
+		def date = new Date()
+		def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+		println "# " + sdf.format(date) + (isTakeAway ? " Take away" : " Dine-in")
+		listOrder.each {
+			item -> println("# " + item.jumlah + " " + item.menu.nama + " @" +  item.menu.harga 
+			+ "\t" + item.menu.harga*item.jumlah)
+		}
+		println("# " + "\t\t\t" + getTotal())
+		println "# "
+		println "##"
 	}
 }
