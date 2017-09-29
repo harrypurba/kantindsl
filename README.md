@@ -1,6 +1,6 @@
 "# kantindsl" 
 
-checklist 
+checklist  
 [Done] jual beli makan  
 [ ] bahan baku: bahan mentah/bahan baku  
 [ ] sampai diserahkan ke pembeli  
